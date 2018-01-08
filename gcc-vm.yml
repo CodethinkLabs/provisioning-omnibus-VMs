@@ -1,0 +1,140 @@
+---
+- hosts: GCCVM
+  vars:
+    ruby_version: "2.2.0"
+    local_ruby_path: "/home/rpm_omnibus/gem/ruby/{{ ruby_version }}"
+    ruby_path: "{{local_ruby_path}}/bin"
+    ruby_gem_path: "/home/rpm_omnibus/gem/ruby/{{ ruby_version }}"
+    rvm_path: "/home/rpm_omnibus/rvm"
+    rvm_ruby_path: "/home/rpm_omnibus/rvm/gems/ruby-{{ ruby_version }}"
+    rvm_rubies_path: "/home/rpm_omnibus/rvm/rubies/ruby-{{ ruby_version }}"
+    add_to_PATH: "{{ rvm_ruby_path }}/bin:{{ rvm_ruby_path }}@global/bin:{{ rvm_rubies_path }}/bin:{{ rvm_path }}/bin:{{ ruby_gem_path }}/bin"
+  tasks:
+  - name: Install the 'Development tools' package group
+    yum:
+      name: "@Development tools"
+      state: latest
+      update_cache: yes
+    become: true
+
+  - name: Install packages required to create gcc rpm with omnibus
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - rpm-build
+    - glibc-devel.i686
+    - libgcc.i686
+    become: true
+
+  - name: Remove repository (and clean up left-over metadata)
+    yum_repository:
+      name: wandisco
+      state: absent
+    become: true
+
+  - name: Install wandisco git repository to install git from it
+    yum:
+      name: http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm
+      state: present
+    become: true
+
+  - name: Install the latest version of git from wandisco repository
+    yum:
+      name: git
+      state: latest
+    become: true
+
+  - name: Append rvm path to environment
+    lineinfile: dest=/etc/environment state=present backrefs=yes regexp='PATH=(["]*)((?!.*?{{add_to_PATH}}).*?)(["]*)$' line="PATH=\1\2:{{add_to_PATH}}\3"
+
+  - name: Ensure necessary packages are installed
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - curl
+      - gnupg2
+
+  - name: Ensure that GPG key for RVM is installed
+    shell: gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+    args:
+        creates: /root/.gnupg/secring.gpg
+    retries: 3
+    delay: 5
+    ignore_errors: yes
+
+  - name: Ensure that RVM is installed
+    shell: curl -L get.rvm.io | bash -s stable --path "{{ rvm_path }}"
+    args:
+      creates: "{{ rvm_path }}"
+
+  - name: Ensure we use RVM default paths
+    shell: source "{{ rvm_path }}/scripts/rvm"
+
+  - name: Ensure that ruby is installed
+    command: "rvm install {{ ruby_version }}"
+    args:
+      creates: "{{ rvm_ruby_path }}"
+    environment:
+      PATH: "{{ add_to_PATH }}:{{ ansible_env.PATH }}"
+
+  - name: Set default version of ruby with rvm
+    command: "rvm alias create default ruby-{{ ruby_version }}"
+    args:
+      creates: "{{ rvm_path }}/config/alias"
+    environment:
+      PATH: "{{ add_to_PATH }}:{{ ansible_env.PATH }}"
+
+  - name: Create bin directory in ruby directory
+    file:
+      path: "{{ local_ruby_path }}/bin"
+      state: directory
+      owner: rpm_omnibus
+      group: rpm_omnibus
+      mode: 0775
+
+  - name: Create /opt/codethink-toolchain
+    file:
+      path: "/opt/codethink-toolchain"
+      state: directory
+      owner: rpm_omnibus
+      group: rpm_omnibus
+      mode: 0775
+    become: yes
+
+  - name: Set the ruby version to use
+    command: rvm use "{{ ruby_version }}"
+
+  - name: Install bundler
+    shell: 'gem install --verbose {{ item }} --install-dir={{ ruby_gem_path }} --no-document --no-rdoc --no-ri --minimal-deps --platform ruby --no-wrappers --suggestions --clear-sources --backtrace'
+    environment:
+      PATH: $PATH:/home/rpm_omnibus/rvm/rubies/ruby-{{ ruby_version }}/bin:{{ ruby_path }}:/usr/bin
+    with_items:
+    - bundler
+
+  - name: Append ruby path to environment
+    lineinfile:
+      dest: /home/rpm_omnibus/.bashrc
+      state: present
+      line: 'export PATH="$PATH:{{ruby_path}}"'
+
+  - name: Append ruby gem path to environment
+    lineinfile:
+      dest: /home/rpm_omnibus/.bashrc
+      state: present
+      line: "export GEM_PATH=$GEM_PATH:{{ruby_gem_path}}"
+
+  - name: Copy omnibus wapper installer into remote
+    copy:
+      src: install-omnibus.sh
+      dest: /home/rpm_omnibus/install-omnibus.sh
+      owner: rpm_omnibus
+      group: rpm_omnibus
+      mode: 0755
+
+  - name: Install omnibus
+    shell: 'bash /home/rpm_omnibus/install-omnibus.sh'
+    environment:
+      PATH: '$PATH:{{add_to_PATH}}:/usr/bin:/bin:/usr/local/bin'
+      GEM_PATH: '$GEM_PATH:{{ruby_gem_path}}'
