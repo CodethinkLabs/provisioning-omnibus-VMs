@@ -28,6 +28,9 @@ configure_vm_for_gcc() {
   ansible-playbook -i hosts gcc-vm.yml \
 	           -e "ansible_user=rpm_omnibus ansible_ssh_pass=1ns3cur3"\
 		   -vv
+  ansible-playbook -i hosts flang-vm.yml \
+	           -e "ansible_user=rpm_omnibus ansible_ssh_pass=1ns3cur3"\
+		   -vv
   popd
 }
 
