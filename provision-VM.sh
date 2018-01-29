@@ -21,7 +21,7 @@ usage() {
 EOF
 }
 
-configure_vm_for_gcc() {
+configure_vm() {
   pushd "$script_dir"
   ansible-playbook -i hosts user-creation.yml \
 	           -e "ansible_user=root ansible_ssh_pass=$vm_root_password"
@@ -71,7 +71,7 @@ main() {
     echo "GCCVM ansible_ssh_host=$vm_ip_address" > "$script_dir/hosts"
   fi
 
-  configure_vm_for_gcc
+  configure_vm
 }
 
 main "$@"

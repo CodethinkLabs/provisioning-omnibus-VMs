@@ -1,6 +1,6 @@
 Documentation
 =============
-This repository provides a bash script (provision-gcc-VM.sh) which calls two
+This repository provides a bash script (provision-VM.sh) which calls two
 playbooks to configure a CentOS 6.x VM with the packages and configuration
 required to build codethink-toolchain
 (https://github.com/CodethinkLabs/omnibus-codethink-toolchain).
@@ -17,7 +17,7 @@ You could find CentOS ISO images in:
 NOTE: if you are creating the VM using the ISO image, remember to configure the
       network enabling eth0 on connection always.
 
-provision-gcc-VM.sh
+provision-VM.sh
 ===================
 For more information about this script run it with -h argument,
-e.g. `./provision-gcc-VM.sh -h`
+e.g. `./provision-VM.sh -h`
