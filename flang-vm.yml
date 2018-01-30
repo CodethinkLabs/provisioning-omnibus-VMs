@@ -1,0 +1,49 @@
+---
+- hosts: GCCVM
+  tasks:
+  - name: Install epel-repository and centos-release-scl
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    with_items:
+    - epel-release
+    - centos-release-scl
+
+  - name: Install packages required to build flang
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    with_items:
+    - cmake3
+    - devtoolset-7
+    - python27
+
+  - name: Create directories in /opt
+    file:
+      path: "/opt/{{ item }}"
+      state: directory
+      owner: rpm_omnibus
+      group: rpm_omnibus
+      mode: 0775
+    become: yes
+    with_items:
+    - codethink-llvm
+    - codethink-clang
+    - codethink-flang
+
+  - name: Append enable scl software in bash_profile
+    lineinfile:
+      dest: /home/rpm_omnibus/.bash_profile
+      state: present
+      line: 'source scl_source enable {{ item }}'
+    with_items:
+    - devtoolset-7
+    - python27
+
+  - name: Append flang library to LD_LIBRARY_PATH
+    lineinfile:
+      dest: /home/rpm_omnibus/.bash_profile
+      state: present
+      line: 'export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/codethink-flang/lib"'
