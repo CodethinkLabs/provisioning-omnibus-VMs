@@ -1,0 +1,14 @@
+# This file does configure the environment variables
+# required to build gcc and run make check to run the tests.
+#
+# To configure gcc to be built or run `make check` please
+# run `source gcc-configure-sourceme` before running your
+# `configure` command when building gcc.
+export CFLAGS="-I/opt/codethink-toolchain/include -O2"
+export CPPFLAGS="-I/opt/codethink-toolchain/include -O2"
+export CXXFLAGS="-I/opt/codethink-toolchain/include -O2"
+export LDFLAGS="-Wl,-rpath,/opt/codethink-toolchain/lib -L/lib64 -L/lib -L/opt/codethink-toolchain/lib64 -L/opt/codethink-toolchain/lib"
+export LD_RUN_PATH="/lib64:/lib:/opt/codethink-toolchain/embedded/lib:/opt/codethink-toolchain/lib64:/opt/codethink-toolchain/lib"
+export PATH="/opt/rh/devtoolset-7/root/usr/bin:/opt/codethink-toolchain/bin:/opt/codethink-toolchain/embedded/bin:/home/rpm_omnibus/rvm/gems/ruby-2.2.0/bin:/home/rpm_omnibus/rvm/gems/ruby-2.2.0@global/bin:/home/rpm_omnibus/rvm/rubies/ruby-2.2.0/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/rpm_omnibus/rvm/bin:/home/rpm_omnibus/bin:/home/rpm_omnibus/gem/ruby/2.2.0/bin"
+export PKG_CONFIG_PATH="/opt/codethink-toolchain/embedded/lib/pkgconfig"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/lib64:/lib:/opt/codethink-toolchain/lib64:/opt/codethink-toolchain/lib"
