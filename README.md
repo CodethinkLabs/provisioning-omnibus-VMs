@@ -8,6 +8,9 @@ required to build codethink-toolchain
 The script assume the CentOS 6.x VM is accessible by ssh client using
 root and its password.
 
+The script will create a rpm_omnibus user which meant to be used to
+configure the installed packages and run the builds.
+
 NOTE: This script has been tested in CentOS 6.6 and 6.8 VMs.
 
 You could find CentOS ISO images in:

@@ -17,7 +17,15 @@
       update_cache: yes
     become: true
 
-  - name: Install packages required to create gcc rpm with omnibus
+  - name: Install centos-release-scl
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    with_items:
+    - centos-release-scl
+
+  - name: Install packages required to build and test gcc
     yum:
       name: "{{ item }}"
       state: latest
@@ -25,6 +33,18 @@
     - rpm-build
     - glibc-devel.i686
     - libgcc.i686
+    - texinfo
+    - libstdc++.i686
+    - dejagnu
+    - devtoolset-7
+    - epel-release
+    become: true
+
+  - name: Install autogen, required for testing gcc
+    yum:
+      name: autogen
+      enablerepo: epel-testing
+      state: latest
     become: true
 
   - name: Remove repository (and clean up left-over metadata)
@@ -138,3 +158,22 @@
     environment:
       PATH: '$PATH:{{add_to_PATH}}:/usr/bin:/bin:/usr/local/bin'
       GEM_PATH: '$GEM_PATH:{{ruby_gem_path}}'
+
+  - name: Copy configuration file for building/testing gcc
+    copy:
+      src: "build-gcc-configuration-files/{{ item }}"
+      dest: /home/rpm_omnibus/build-gcc/
+      owner: rpm_omnibus
+      group: rpm_omnibus
+      mode: 0644
+    with_items:
+    - gcc-configure-sourceme
+    - README
+
+  - name: Append enable scl devtoolset-7 in bash_profile
+    lineinfile:
+      dest: /home/rpm_omnibus/.bash_profile
+      state: present
+      line: 'source scl_source enable {{ item }}'
+    with_items:
+    - devtoolset-7
