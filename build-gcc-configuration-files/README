@@ -7,7 +7,7 @@ gcc too but we are looking for developing and testing gcc in a separate tree):
 
   git clone https://github.com/CodethinkLabs/omnibus-codethink-toolchain.git
   cd omnibus-codethink-toolchain
-  omnibus build codethink-toolchain --override base_dir:./local workers:8
+  omnibus build codethink-gcc --override base_dir:./local workers:8
 
 After gathering all the required packages we need to tell gcc where these packages are
 and for that we will need to use the gcc-configure-sourceme file:
@@ -17,7 +17,7 @@ and for that we will need to use the gcc-configure-sourceme file:
   git checkout codethink/$BRANCH_TO_BUILD
   cd /home/rpm_omnibus/build-gcc
   source gcc-configure-sourceme
-  ../gcc/configure --prefix=/home/rpm_omnibus/build-gcc --enable-languages=c,c++,fortran --with-pkgversion=codethink-toolchain --disable-bootstrap --disable-nls
+  ../gcc/configure --prefix=/home/rpm_omnibus/build-gcc --enable-languages=c,c++,fortran --with-pkgversion=codethink-gcc --disable-bootstrap --disable-nls
   make -j 8
 
 If you would like to run gcc tests, after building you can run

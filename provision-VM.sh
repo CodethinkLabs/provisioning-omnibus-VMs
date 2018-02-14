@@ -8,7 +8,7 @@ usage() {
 
   This script installs the required software and configures the VM,
   described by its VM_IP_ADDRESS passed as argument to be able to
-  build the codethink-toolchain repository.
+  build the packages in omnibus-codethink-toolchain repository.
   (https://github.com/CodethinkLabs/omnibus-codethink-toolchain).
 
   OPTIONS:

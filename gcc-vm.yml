@@ -114,9 +114,9 @@
       group: rpm_omnibus
       mode: 0775
 
-  - name: Create /opt/codethink-toolchain
+  - name: Create /opt/codethink-gcc
     file:
-      path: "/opt/codethink-toolchain"
+      path: "/opt/codethink-gcc"
       state: directory
       owner: rpm_omnibus
       group: rpm_omnibus
