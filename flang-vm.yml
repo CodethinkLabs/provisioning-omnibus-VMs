@@ -1,12 +1,21 @@
 ---
 - hosts: GCCVM
   tasks:
+  - name: Install centos-release-scl
+    yum:
+      name: "{{ item }}"
+      state: latest
+    become: true
+    with_items:
+    - centos-release-scl
+
   - name: Install packages required to build flang
     yum:
       name: "{{ item }}"
       state: latest
     become: true
     with_items:
+    - devtoolset-7
     - cmake3
     - python27
 
@@ -23,12 +32,13 @@
     - codethink-clang
     - codethink-flang
 
-  - name: Append enable scl python software in bash_profile
+  - name: Append enable scl software in bash_profile
     lineinfile:
       dest: /home/rpm_omnibus/.bash_profile
       state: present
       line: 'source scl_source enable {{ item }}'
     with_items:
+    - devtoolset-7
     - python27
 
   - name: Append flang library to LD_LIBRARY_PATH
