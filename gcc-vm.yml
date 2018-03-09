@@ -38,12 +38,6 @@
       state: latest
     become: true
 
-  - name: Remove repository (and clean up left-over metadata)
-    yum_repository:
-      name: wandisco
-      state: absent
-    become: true
-
   - name: Install wandisco git repository to install git from it
     yum:
       name: http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm
