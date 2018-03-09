@@ -17,14 +17,6 @@
       update_cache: yes
     become: true
 
-  - name: Install centos-release-scl
-    yum:
-      name: "{{ item }}"
-      state: latest
-    become: true
-    with_items:
-    - centos-release-scl
-
   - name: Install packages required to build and test gcc
     yum:
       name: "{{ item }}"
@@ -36,7 +28,6 @@
     - texinfo
     - libstdc++.i686
     - dejagnu
-    - devtoolset-7
     - epel-release
     become: true
 
@@ -169,11 +160,3 @@
     with_items:
     - gcc-configure-sourceme
     - README
-
-  - name: Append enable scl devtoolset-7 in bash_profile
-    lineinfile:
-      dest: /home/rpm_omnibus/.bash_profile
-      state: present
-      line: 'source scl_source enable {{ item }}'
-    with_items:
-    - devtoolset-7
